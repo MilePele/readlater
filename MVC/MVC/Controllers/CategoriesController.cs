@@ -64,6 +64,19 @@ namespace MVC.Controllers
             return View(category);
         }
 
+        [HttpPost]
+        public JsonResult ExternalCreate(Category category)
+        {
+            string response = string.Empty;
+            if (ModelState.IsValid)
+            {
+                Category newCategory = _categoryService.CreateCategory(category);
+                return Json(new { response = true.ToString(), name = newCategory.Name, id = newCategory.ID });
+            }
+
+            return Json(new { response = false.ToString() });
+        }
+
         // GET: Categories/Edit/5
         public ActionResult Edit(int? id)
         {

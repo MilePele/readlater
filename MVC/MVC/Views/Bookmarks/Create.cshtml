@@ -1,0 +1,125 @@
+﻿@model ReadLater.Entities.Bookmark
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Bookmark</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.URL, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.URL, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.URL, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ShortDescription, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ShortDescription, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ShortDescription, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CategoryId, "Category", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-8">
+                @Html.DropDownList("CategoryId", null, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-sm-10 col-sm-offset-2" style="margin-top:5px;">
+                <a href="#" class="btn btn-default" role="button" onclick="showAddNewCatregoryDialog()">Add New Category</a>
+            </div>
+        </div>
+
+        @*<div class="form-group">
+                @Html.LabelFor(model => model.CreateDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.CreateDate, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.CreateDate, "", new { @class = "text-danger" })
+                </div>
+            </div>*@
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create Bookmark" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+<div id="add-new-category" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add new category</h4>
+            </div>
+            <div class="modal-body">
+                <p class="text-danger save-category-error" style="display:none">Something went wrong, please try again</p>
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Category Name</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="Name" name="Name" />
+                            <p class="text-danger category-validation-error" style="display:none">Please insert category name</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveCategory()">Save</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        function showAddNewCatregoryDialog() {
+            $('#add-new-category').modal('show');
+        }
+
+        function saveCategory() {
+            let name = $('#Name').val();
+
+            if (name.trim().length > 0) {
+                $.ajax({
+                    url: '@Url.Action("ExternalCreate", "Categories")',
+                    method: 'POST',
+                    data: { Name: name },
+                    success: function (data) {
+                        if (data.response === 'True') {
+                            $('<option value="' + data.id + '">' + data.name + '</option>').appendTo('#CategoryId');
+                            $('#CategoryId option[value="' + data.id + '"]').prop('selected', 'selected');
+                            $('#Name').val('');
+                            $('.save-category-error').hide();
+                            $('#add-new-category').modal('hide');
+                        } else {
+                            $('.save-category-error').show();
+                        }
+                    },
+                    error: function () {
+                        $('.save-category-error').show();
+                    }
+                })
+            }
+        }
+    </script>
+}

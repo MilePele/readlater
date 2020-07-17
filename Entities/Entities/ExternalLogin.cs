@@ -7,13 +7,16 @@ using System.Threading.Tasks;
 
 namespace ReadLater.Entities
 {
-    public class Category : EntityBase
+    public class ExternalLogin : EntityBase
     {
         [Key]
         public int ID { get; set; }
+        
+        [StringLength(maximumLength: 256)]
+        public string Token { get; set; }
 
-        [Display(Name="Category Name")]
-        [StringLength(maximumLength: 50)]
-        public string Name { get; set; }
+        public DateTime TimeCreated { get; set; }
+
+        public bool Expired { get; set; }
     }
 }
